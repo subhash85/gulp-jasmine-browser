@@ -3,6 +3,8 @@ import mime from 'mime';
 import path from 'path';
 import favicon from 'serve-favicon';
 import {PassThrough} from 'stream';
+import https from 'https';
+
 
 function log(message) {
   try {
@@ -57,7 +59,11 @@ function createServer(files, options = {}) {
 
 function listen(port, files, options = {}) {
   return new Promise(resolve => {
-    const server = createServer(files, options).listen(port, function() {
+      let server = createServer(files, options);
+      if(options.https){
+          https.createServer(options.certs, server)
+      }
+      server.listen(port, function() {
       log(`Jasmine server listening on port ${port}`);
       resolve({server, port});
     });
